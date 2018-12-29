@@ -106,7 +106,7 @@ vcd::mosaic(~ Group + dominant_color,
                                                       "center", 
                                                       "center")))
 
-# Draw spatial heat map of percent of dogs spayed or neutered by zip code
+# Get the percent of dogs that are spayed or neutered by zip code
 zips_df <- df[c("spayed_or_neutered", "zip_code")] %>%
   group_by(zip_code, spayed_or_neutered) %>%
   summarise(counts = n()) %>%
@@ -118,13 +118,30 @@ zips_df$zip_code <- as.character(zips_df$zip_code)
 # Define zip codes for the five boroughs
 nyc_fips <- c(36005, 36047, 36061, 36081, 36085)
 
-# Create visualization
+# Create spatial heat map visualization
 zip_choropleth(zips_df, 
                title = "Spayed or Neutered Dogs in NYC: Spatial Heat Map",
                county_zoom = nyc_fips,
                legend = "Percent Spayed or Neutered Dogs") +
   scale_fill_brewer(palette=7)
 
+# Get dog data by Group and filter by birth_year
+dog_groups <- df[c(2,4,5,12)] %>%
+  mutate(birth_year = substr(birth, 1, 4)) %>%
+  group_by(birth_year, Group) %>%
+  summarise(counts = n()) %>%
+  filter(1991 < birth_year & birth_year < 2012)
 
-
-
+# Create Cleveland Dot Plot of Group counts by birth_year
+ggplot(dog_groups, aes(x = counts,
+                          y = birth_year,
+                          color = Group)) +
+  geom_point() +
+  labs(color = 'Dog Group') +
+  ggtitle('NYC Dog Group Counts by Year') +
+  scale_x_continuous(name = 'Count') +
+  scale_y_discrete(name = 'Year') +
+  theme(axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        plot.title = element_text(hjust = 0.5, size = 16),
+        legend.title = element_text(hjust = 0.5, size = 10))
