@@ -138,7 +138,7 @@ ggplot(dog_groups, aes(x = counts,
                           color = Group)) +
   geom_point() +
   labs(color = 'Dog Group') +
-  ggtitle('NYC Dog Group Counts by Year') +
+  ggtitle('Mutts and Toy Dogs Gaining Popularity in NYC') +
   scale_x_continuous(name = 'Count') +
   scale_y_discrete(name = 'Year') +
   theme(axis.title.x = element_text(size = 13),
