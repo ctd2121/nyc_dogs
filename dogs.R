@@ -30,7 +30,7 @@ ggplot(filter(missing_df, missing_pct > 0), aes(x = reorder(var, -missing_pct), 
   ggtitle("Missing Values by Variable (excludes variables with no missing values)") +
   scale_x_discrete(name = "Variable") + 
   scale_y_continuous(name = "Percent Missing") +
-  theme(plot.title = element_text(hjust = 0.5, size = 14),
+  theme(plot.title = element_text(hjust = 0.5, size = 12),
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12))
 
@@ -60,27 +60,27 @@ hist(df$birth, "months", freq = TRUE,
      format = "%b %y")
 
 # Remove impossible values
-df <- df %>%
-  filter(birth < "2018-01-01" & birth > "1994-01-01")
+df1 <- df %>%
+  filter(birth < "2011-01-01" & birth > "1994-01-01")
 
 # Redraw histogram with a one-year binwidth
-hist(df$birth, "years", freq = TRUE,
+hist(df1$birth, "years", freq = TRUE,
      main = "Birthdates Histogram", 
      xlab = "Birth Year",
      format = "%Y")
 
 # Get top five values of dominant_color present in the dataset
-color_counts <- aggregate(data.frame(count = df$dominant_color),
-                          list(value = df$dominant_color), length) %>%
+color_counts <- aggregate(data.frame(count = df1$dominant_color),
+                          list(value = df1$dominant_color), length) %>%
   arrange(-count)
 top_colors <- color_counts %>%
   head(5)
 top_colors <- as.list(as.character(top_colors$value))
-dogs_top_colors <- df %>%
+dogs_top_colors <- df1 %>%
   filter(dominant_color %in% top_colors)
 
 # Group all remaining values of dominant_color into category "Other"
-dogs_bot_colors <- df %>%
+dogs_bot_colors <- df1 %>%
   filter(!(dominant_color %in% top_colors))
 dogs_bot_colors$dominant_color = "OTHER"
 dogs_6colors <- rbind(dogs_top_colors, dogs_bot_colors)
@@ -107,7 +107,7 @@ vcd::mosaic(~ Group + dominant_color,
                                                       "center")))
 
 # Get the percent of dogs that are spayed or neutered by zip code
-zips_df <- df[c("spayed_or_neutered", "zip_code")] %>%
+zips_df <- df1[c("spayed_or_neutered", "zip_code")] %>%
   group_by(zip_code, spayed_or_neutered) %>%
   summarise(counts = n()) %>%
   spread(spayed_or_neutered, counts, fill = 0) %>%
@@ -126,7 +126,7 @@ zip_choropleth(zips_df,
   scale_fill_brewer(palette=7)
 
 # Get dog data by Group and filter by birth_year
-dog_groups <- df[c(2,4,5,12)] %>%
+dog_groups <- df1[c(2,4,5,12)] %>%
   mutate(birth_year = substr(birth, 1, 4)) %>%
   group_by(birth_year, Group) %>%
   summarise(counts = n()) %>%
